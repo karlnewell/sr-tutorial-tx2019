@@ -2,7 +2,7 @@
 
 common:
   bgp_asn: 65000
-  gateway: 10.39.0.1
+  gateway: 100.123.0.1
 
 nodes:
   - name: srtut-vmx
@@ -121,13 +121,13 @@ links:
       right: srtut-vmx6, right_port: ge-0/0/3, right_ip: 10.0.56.6, 
       mask: 24, cost: 1000, mpls: True, iso: True }
 
-# bgp:
-# rr: [10.10.10.10]
-# clients: [2.2.2.2, 6.6.6.6]
-#  af:
-#    - inet
-#    - inet6
-#    - inet-vpn
+bgp:
+  rr: [10.10.10.10]
+  clients: [2.2.2.2, 6.6.6.6]
+  af:
+    - inet
+    - inet6
+    - inet-vpn
 
 #isis:
 #  network: p2p
