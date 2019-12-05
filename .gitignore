@@ -112,3 +112,4 @@ group_vars/vmware
 *.ovf
 *.tar
 *.qcow2
+files/srtut-config/*

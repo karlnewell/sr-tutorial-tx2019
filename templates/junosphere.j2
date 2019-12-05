@@ -316,7 +316,8 @@ protocols {
 ###         LDP  Variables                  ######
 **************************************************
 #}
-{% if node.ldp is defined  %}
+{%  if ldp_disabled is defined %}
+{%  elif node.ldp is defined %}
     ldp {
 {%      for intf, intf_attr in node.links.items()|sort %}
         interface {{intf}};

@@ -203,12 +203,6 @@ protocols {
             passive;
         }
     }
-    ldp {
-        interface ge-0/0/1.0;
-        interface ge-0/0/2.0;
-        interface ge-0/0/3.0;
-        interface lo0.0;
-    }
     mpls {
     	icmp-tunneling;
         interface ge-0/0/1.0;
