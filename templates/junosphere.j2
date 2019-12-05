@@ -342,6 +342,7 @@ protocols {
 **************************************************
 #}
     mpls {
+    	icmp-tunneling;
 {%      for intf, intf_attr in node.links.items()|sort %}
         interface {{intf}};
 {%      endfor %}
