@@ -1,10 +1,10 @@
 
 version VERSION
 system {
-    host-name srtut2-vmx3;
+    host-name srtut-vmx2;
     no-redirects;
     root-authentication {
-        encrypted-password "$5$mcE0Hfiq$JfBeC3QSAvnd1tjqlOhlYXDgVrwvd6S4G3oVj5wiMO7"; ## SECRET-DATA
+        encrypted-password "$6$q7ZQ3R0N$L53cGK7wGmeyfom5GvYrR2quPXyrEpnFcUmpgxllTvYLKrXoHHCzgf4LbZDeS0zMmhMu/A5eay0WHo1S0/OHa/"; ## SECRET-DATA
     }
     login {
         user salt {
@@ -86,35 +86,11 @@ chassis {
     network-services enhanced-ip;
 }
 interfaces {
-    ge-0/0/0 {
-        description "srtut2-vmx4"
-        unit 0 {
-            family inet {
-                address 10.0.34.33/24
-            }
-            family inet6;
-            family mpls;
-            family iso;
-        }
-    }
-   
     ge-0/0/1 {
-        description "srtut2-vmx4"
+        description "srtut-vmx1"
         unit 0 {
             family inet {
-                address 10.0.34.3/24
-            }
-            family inet6;
-            family mpls;
-            family iso;
-        }
-    }
-   
-    ge-0/0/2 {
-        description "srtut2-vmx1"
-        unit 0 {
-            family inet {
-                address 10.0.13.3/24
+                address 10.0.12.2/24
             }
             family inet6;
             family mpls;
@@ -126,27 +102,32 @@ interfaces {
         description "OOB to MGMT Network";
         unit 0 {
             family inet {
-                address 10.39.0.193/21;
+                address 100.123.1.2/16;
             }
         }
     }
     lo0 {
         unit 0 {
             family inet {
-                address 3.3.3.3/32;
+                address 2.2.2.2/32;
             }
             family inet6 {
-                address fec0:0:0:1111::3/128;
+                address fec0:0:0:1111::2/128;
             }
             family iso {
-                address 49.0001.0010.0100.1003.00;
+                address 49.0001.0010.0100.1002.00;
             }
             
+        }
+        unit 1 {
+            family inet {
+                address 100.100.100.2/32;
+            }
         }
     }
 }
 routing-options {
-    router-id 3.3.3.3;
+    router-id 2.2.2.2;
     autonomous-system 65000;
     forwarding-table {
         export LOAD-BALANCE;
@@ -163,15 +144,7 @@ protocols {
     isis {
                 level 1 disable;
         level 2 wide-metrics-only;
-        interface ge-0/0/0.0 {
-            point-to-point;
-            level 2 metric 1000;
-        }
         interface ge-0/0/1.0 {
-            point-to-point;
-            level 2 metric 1000;
-        }
-        interface ge-0/0/2.0 {
             point-to-point;
             level 2 metric 1000;
         }
@@ -180,22 +153,16 @@ protocols {
         }
     }
     ldp {
-        interface ge-0/0/0.0;
         interface ge-0/0/1.0;
-        interface ge-0/0/2.0;
         interface lo0.0;
     }
     mpls {
-        interface ge-0/0/0.0;
         interface ge-0/0/1.0;
-        interface ge-0/0/2.0;
     }
     lldp {
         port-id-subtype interface-name;
         neighbour-port-info-display port-id;
-        interface ge-0/0/0;
         interface ge-0/0/1;
-        interface ge-0/0/2;
     }
 }
 policy-options {
@@ -203,5 +170,14 @@ policy-options {
         then {
             load-balance per-packet;
         }
+    }
+}
+routing-instances {
+    BLUE {
+        instance-type vrf;
+        interface lo0.1;
+        route-distinguisher 2.2.2.2:100;
+        vrf-target target:100:100;
+        vrf-table-label;
     }
 }

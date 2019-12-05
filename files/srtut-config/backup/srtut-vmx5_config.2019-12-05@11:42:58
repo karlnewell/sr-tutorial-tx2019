@@ -1,0 +1,83 @@
+set version 20190606.224121_builder.r1033375
+set system host-name srtut-vmx5
+set system root-authentication encrypted-password "$6$q7ZQ3R0N$L53cGK7wGmeyfom5GvYrR2quPXyrEpnFcUmpgxllTvYLKrXoHHCzgf4LbZDeS0zMmhMu/A5eay0WHo1S0/OHa/"
+set system scripts language python
+set system login user jcluser uid 2000
+set system login user jcluser class super-user
+set system login user jcluser authentication encrypted-password "$6$7rmbaWhB$QSsd9lpzkDZEV/ebNdv4U37un2hGiVSP1WMChfTjys.N9U7TjA8ezyrEQVsGaJiLgIikVJFVfhV/OAnf4.ssM1"
+set system login user jcluser authentication ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDCKe9JQ37jkk+LsYfXpQY3Ae0bujvN5aMukCiEqsXWKTZNll3wosDgQbn9vLANBYTPJVVMojByllBqux58mbNZiof5u5ZiH+NBxPGj6abFMspc/TXE/tNTnvBmkyJ20H0OW+gMDI3Pzs4UOV/BKcSifrdDg6gZsXwiBGoueT+v2D29oiqlQiwU80IhsjEw7EnZAzOdc9uYxtF8fCOmViN2TydUL1JUdux8org/0HVaRGRLoG8IKikF5jp/qvBb1+5zT0DKhyY5xp3yHa9gYSLENDJC+NrkERpq25bz96pIzo2205ULUETMRB79eKfvtkJZCiUQlubglD4GcW/8hq43"
+set system login user salt uid 2001
+set system login user salt class super-user
+set system login user salt authentication encrypted-password "$5$yp7ziGTI$F5F.6AUlR8hDK2JIsw5WRrTLex/yTCWH3iSR1Auk293"
+set system login user salt authentication ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCjxY2hLZ+ju5wdK4GYNhKGgnS8EWLBoEVpo+xQkhDzkTiBx3HGAnmARcVV0B9MqrHZl1omdnirJeygWzVbVY4yPUqGgEcUsTTq9fvK4AjTwtaoB5txAosaOnZq0zewmuZ6EMi6E3RND6A3FGXkf1Il2jg3I8k/dGqdyFI80B7sWy90fk+EqsGMPxVc+l5vAtY2jm84ellxxzBsulxfCSKPH86hZ1GqZ8A1ZBWITu15NjQw0aGssSYGMMTa1T8eFyY4hHWqqdwgOlODg9mZwwP1JdJH79SRoTOjqGGixuAFDGAgH3fNX6u8wTmYya/z7WXH6B2XwiiaZYdcyEbMLPZt"
+set system services ssh root-login allow
+set system services extension-service request-response grpc clear-text
+set system services extension-service request-response grpc max-connections 10
+set system services extension-service request-response grpc skip-authentication
+set system services netconf ssh
+set system services netconf traceoptions file nc.txt
+set system services netconf traceoptions file size 1m
+set system services netconf traceoptions file world-readable
+set system services netconf traceoptions flag all
+set system services rest http port 3000
+set system services rest enable-explorer
+set system no-redirects
+set system syslog user * any emergency
+set system syslog file messages any any
+set system syslog file messages authorization info
+set system syslog file interactive-commands interactive-commands any
+set system processes dhcp-service traceoptions file dhcp_logfile
+set system processes dhcp-service traceoptions file size 10m
+set system processes dhcp-service traceoptions level all
+set system processes dhcp-service traceoptions flag packet
+set chassis fpc 0 pic 0 number-of-ports 8
+set chassis fpc 0 lite-mode
+set chassis network-services enhanced-ip
+set interfaces ge-0/0/1 description srtut-vmx
+set interfaces ge-0/0/1 unit 0 family inet address 10.0.105.5/24
+set interfaces ge-0/0/1 unit 0 family iso
+set interfaces ge-0/0/1 unit 0 family inet6
+set interfaces ge-0/0/1 unit 0 family mpls
+set interfaces ge-0/0/2 description srtut-vmx4
+set interfaces ge-0/0/2 unit 0 family inet address 10.0.45.5/24
+set interfaces ge-0/0/2 unit 0 family iso
+set interfaces ge-0/0/2 unit 0 family inet6
+set interfaces ge-0/0/2 unit 0 family mpls
+set interfaces ge-0/0/3 description srtut-vmx6
+set interfaces ge-0/0/3 unit 0 family inet address 10.0.56.5/24
+set interfaces ge-0/0/3 unit 0 family iso
+set interfaces ge-0/0/3 unit 0 family inet6
+set interfaces ge-0/0/3 unit 0 family mpls
+set interfaces fxp0 description "OOB to MGMT Network"
+set interfaces fxp0 unit 0 family inet address 100.123.1.5/16
+set interfaces lo0 unit 0 family inet address 5.5.5.5/32
+set interfaces lo0 unit 0 family iso address 49.0001.0010.0100.1005.00
+set interfaces lo0 unit 0 family inet6 address fec0:0:0:1111::5/128
+set policy-options policy-statement LOAD-BALANCE then load-balance per-packet
+set routing-options static route 0.0.0.0/0 next-hop 10.39.0.1
+set routing-options static route 0.0.0.0/0 no-readvertise
+set routing-options static route 0.0.0.0/0 preference 255
+set routing-options forwarding-table export LOAD-BALANCE
+set routing-options router-id 5.5.5.5
+set routing-options autonomous-system 65000
+set protocols isis level 1 disable
+set protocols isis level 2 wide-metrics-only
+set protocols isis interface ge-0/0/1.0 point-to-point
+set protocols isis interface ge-0/0/1.0 level 2 metric 1000
+set protocols isis interface ge-0/0/2.0 point-to-point
+set protocols isis interface ge-0/0/2.0 level 2 metric 1000
+set protocols isis interface ge-0/0/3.0 point-to-point
+set protocols isis interface ge-0/0/3.0 level 2 metric 1000
+set protocols isis interface lo0.0 passive
+set protocols mpls interface ge-0/0/1.0
+set protocols mpls interface ge-0/0/2.0
+set protocols mpls interface ge-0/0/3.0
+set protocols ldp interface ge-0/0/1.0
+set protocols ldp interface ge-0/0/2.0
+set protocols ldp interface ge-0/0/3.0
+set protocols ldp interface lo0.0
+set protocols lldp port-id-subtype interface-name
+set protocols lldp neighbour-port-info-display port-id
+set protocols lldp interface ge-0/0/1
+set protocols lldp interface ge-0/0/2
+set protocols lldp interface ge-0/0/3

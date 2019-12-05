@@ -5,4 +5,5 @@ tasks_dir: files/srtut-tasks
 dryrun: True
 ova_ver: 19.2R1.8
 template: junosphere
-
+ansible_user: jcluser
+ansible_ssh_pass: Juniper!1

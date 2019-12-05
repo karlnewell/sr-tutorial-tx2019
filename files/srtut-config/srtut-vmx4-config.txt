@@ -1,10 +1,10 @@
 
 version VERSION
 system {
-    host-name srtut2-vmx;
+    host-name srtut-vmx4;
     no-redirects;
     root-authentication {
-        encrypted-password "$5$mcE0Hfiq$JfBeC3QSAvnd1tjqlOhlYXDgVrwvd6S4G3oVj5wiMO7"; ## SECRET-DATA
+        encrypted-password "$6$q7ZQ3R0N$L53cGK7wGmeyfom5GvYrR2quPXyrEpnFcUmpgxllTvYLKrXoHHCzgf4LbZDeS0zMmhMu/A5eay0WHo1S0/OHa/"; ## SECRET-DATA
     }
     login {
         user salt {
@@ -87,10 +87,10 @@ chassis {
 }
 interfaces {
     ge-0/0/0 {
-        description "srtut2-vmx1"
+        description "srtut-vmx3"
         unit 0 {
             family inet {
-                address 10.0.101.10/24
+                address 10.0.34.44/24
             }
             family inet6;
             family mpls;
@@ -99,10 +99,22 @@ interfaces {
     }
    
     ge-0/0/1 {
-        description "srtut2-vmx5"
+        description "srtut-vmx3"
         unit 0 {
             family inet {
-                address 10.0.105.10/24
+                address 10.0.34.4/24
+            }
+            family inet6;
+            family mpls;
+            family iso;
+        }
+    }
+   
+    ge-0/0/2 {
+        description "srtut-vmx5"
+        unit 0 {
+            family inet {
+                address 10.0.45.4/24
             }
             family inet6;
             family mpls;
@@ -114,27 +126,27 @@ interfaces {
         description "OOB to MGMT Network";
         unit 0 {
             family inet {
-                address 10.39.0.190/21;
+                address 100.123.1.4/16;
             }
         }
     }
     lo0 {
         unit 0 {
             family inet {
-                address 10.10.10.10/32;
+                address 4.4.4.4/32;
             }
             family inet6 {
-                address fec0:0:0:1111::10/128;
+                address fec0:0:0:1111::4/128;
             }
             family iso {
-                address 49.0001.0010.0100.1010.00;
+                address 49.0001.0010.0100.1004.00;
             }
             
         }
     }
 }
 routing-options {
-    router-id 10.10.10.10;
+    router-id 4.4.4.4;
     autonomous-system 65000;
     forwarding-table {
         export LOAD-BALANCE;
@@ -159,6 +171,10 @@ protocols {
             point-to-point;
             level 2 metric 1000;
         }
+        interface ge-0/0/2.0 {
+            point-to-point;
+            level 2 metric 1000;
+        }
         interface lo0.0 {
             passive;
         }
@@ -166,17 +182,20 @@ protocols {
     ldp {
         interface ge-0/0/0.0;
         interface ge-0/0/1.0;
+        interface ge-0/0/2.0;
         interface lo0.0;
     }
     mpls {
         interface ge-0/0/0.0;
         interface ge-0/0/1.0;
+        interface ge-0/0/2.0;
     }
     lldp {
         port-id-subtype interface-name;
         neighbour-port-info-display port-id;
         interface ge-0/0/0;
         interface ge-0/0/1;
+        interface ge-0/0/2;
     }
 }
 policy-options {

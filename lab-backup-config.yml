@@ -6,6 +6,10 @@
   vars_files:
   - "files/{{ variable_hosts }}_nodes.yml"
   tasks:
+    - name: create the directory for the backups
+      file: path="{{ config_dir }}/backup"  state=directory
+      delegate_to: localhost
+      run_once: true
     - name: Backup config (junos)
       junos_config:
         backup: yes

@@ -1,230 +1,123 @@
+#
+# Nodes in the network
+#
+
+
+---
+
 common:
-  bgp_asn: 65000
-  gateway: 10.39.0.1
+    bgp_asn: 65000
+    gateway: 10.39.0.1
+
 nodes:
-  srtut2-vmx:
-    iso: 49.0001.0010.0100.1010.00
-    ldp: true
-    links:
-      ge-0/0/0.0:
-        cost: 1000
-        ip: 10.0.101.10
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx1
-        vlan: 0
-      ge-0/0/1.0:
-        cost: 1000
-        ip: 10.0.105.10
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx5
-        vlan: 0
-    mgmt: 10.39.0.190
-    rid: 10.10.10.10
-    rid6: fec0:0:0:1111::10
+
+  srtut-vmx:
+    mgmt: 100.123.1.0
+    rid:  10.10.10.10
+    rid6:  fec0:0:0:1111::10
     sid: 410
     sid6: 610
+    iso: 49.0001.0010.0100.1010.00
+    ldp: True
     switches:
-    - srtut2-vmx-0--srtut2-vmx1-0
-    - srtut2-vmx-1--srtut2-vmx5-1
-  srtut2-vmx1:
-    iso: 49.0001.0010.0100.1001.00
-    ldp: true
+       - srtut-vmx-0--srtut-vmx1-0
+       - srtut-vmx-1--srtut-vmx5-1
     links:
-      ge-0/0/0.0:
-        cost: 1000
-        ip: 10.0.101.1
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx
-        vlan: 0
-      ge-0/0/1.0:
-        cost: 1000
-        ip: 10.0.12.1
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx2
-        vlan: 0
-      ge-0/0/2.0:
-        cost: 1000
-        ip: 10.0.13.1
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx3
-        vlan: 0
-    mgmt: 10.39.0.191
-    rid: 1.1.1.1
-    rid6: fec0:0:0:1111::1
+      ge-0/0/0.0: { ip: 10.0.101.10, remote: srtut-vmx1, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+      ge-0/0/1.0: { ip: 10.0.105.10, remote: srtut-vmx5, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+
+  srtut-vmx1:
+    mgmt: 100.123.1.1
+    rid:  1.1.1.1
+    rid6:  fec0:0:0:1111::1
     sid: 401
     sid6: 601
+    iso: 49.0001.0010.0100.1001.00
+    ldp: True
     switches:
-    - srtut2-vmx-0--srtut2-vmx1-0
-    - srtut2-vmx1-1--srtut2-vmx2-1
-    - srtut2-vmx1-2--srtut2-vmx3-2
-  srtut2-vmx2:
-    iso: 49.0001.0010.0100.1002.00
-    l3vpn:
-    - intf: lo0.1
-      intf_ip: 100.100.100.2
-      name: BLUE
-      rd: 100
-      rt: 100:100
-    ldp: true
+       - srtut-vmx-0--srtut-vmx1-0
+       - srtut-vmx1-1--srtut-vmx2-1
+       - srtut-vmx1-2--srtut-vmx3-2
     links:
-      ge-0/0/1.0:
-        cost: 1000
-        ip: 10.0.12.2
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx1
-        vlan: 0
-    mgmt: 10.39.0.192
-    rid: 2.2.2.2
-    rid6: fec0:0:0:1111::2
+      ge-0/0/0.0: { ip: 10.0.101.1, remote: srtut-vmx, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+      ge-0/0/1.0: { ip: 10.0.12.1, remote: srtut-vmx2, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+      ge-0/0/2.0: { ip: 10.0.13.1, remote: srtut-vmx3, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+
+  srtut-vmx2:
+    mgmt: 100.123.1.2
+    rid:  2.2.2.2
+    rid6:  fec0:0:0:1111::2
     sid: 402
     sid6: 602
+    iso: 49.0001.0010.0100.1002.00
+    ldp: True
+    l3vpn: [{'intf': 'lo0.1', 'intf_ip': '100.100.100.2', 'name': 'BLUE', 'rd': 100, 'rt': '100:100'}]
     switches:
-    - srtut2-vmx1-1--srtut2-vmx2-1
-  srtut2-vmx3:
-    iso: 49.0001.0010.0100.1003.00
-    ldp: true
+       - srtut-vmx1-1--srtut-vmx2-1
     links:
-      ge-0/0/0.0:
-        cost: 1000
-        ip: 10.0.34.33
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx4
-        vlan: 0
-      ge-0/0/1.0:
-        cost: 1000
-        ip: 10.0.34.3
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx4
-        vlan: 0
-      ge-0/0/2.0:
-        cost: 1000
-        ip: 10.0.13.3
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx1
-        vlan: 0
-    mgmt: 10.39.0.193
-    rid: 3.3.3.3
-    rid6: fec0:0:0:1111::3
+      ge-0/0/1.0: { ip: 10.0.12.2, remote: srtut-vmx1, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+
+  srtut-vmx3:
+    mgmt: 100.123.1.3
+    rid:  3.3.3.3
+    rid6:  fec0:0:0:1111::3
     sid: 403
     sid6: 603
+    iso: 49.0001.0010.0100.1003.00
+    ldp: True
     switches:
-    - srtut2-vmx3-0--srtut2-vmx4-0
-    - srtut2-vmx3-1--srtut2-vmx4-1
-    - srtut2-vmx1-2--srtut2-vmx3-2
-  srtut2-vmx4:
-    iso: 49.0001.0010.0100.1004.00
-    ldp: true
+       - srtut-vmx1-2--srtut-vmx3-2
+       - srtut-vmx3-1--srtut-vmx4-1
+       - srtut-vmx3-0--srtut-vmx4-0
     links:
-      ge-0/0/0.0:
-        cost: 1000
-        ip: 10.0.34.44
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx3
-        vlan: 0
-      ge-0/0/1.0:
-        cost: 1000
-        ip: 10.0.34.4
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx3
-        vlan: 0
-      ge-0/0/2.0:
-        cost: 1000
-        ip: 10.0.45.4
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx5
-        vlan: 0
-    mgmt: 10.39.0.194
-    rid: 4.4.4.4
-    rid6: fec0:0:0:1111::4
+      ge-0/0/2.0: { ip: 10.0.13.3, remote: srtut-vmx1, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+      ge-0/0/1.0: { ip: 10.0.34.3, remote: srtut-vmx4, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+      ge-0/0/0.0: { ip: 10.0.34.33, remote: srtut-vmx4, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+
+  srtut-vmx4:
+    mgmt: 100.123.1.4
+    rid:  4.4.4.4
+    rid6:  fec0:0:0:1111::4
     sid: 404
     sid6: 604
+    iso: 49.0001.0010.0100.1004.00
+    ldp: True
     switches:
-    - srtut2-vmx3-0--srtut2-vmx4-0
-    - srtut2-vmx3-1--srtut2-vmx4-1
-    - srtut2-vmx4-2--srtut2-vmx5-2
-  srtut2-vmx5:
-    iso: 49.0001.0010.0100.1005.00
-    ldp: true
+       - srtut-vmx3-1--srtut-vmx4-1
+       - srtut-vmx3-0--srtut-vmx4-0
+       - srtut-vmx4-2--srtut-vmx5-2
     links:
-      ge-0/0/1.0:
-        cost: 1000
-        ip: 10.0.105.5
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx
-        vlan: 0
-      ge-0/0/2.0:
-        cost: 1000
-        ip: 10.0.45.5
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx4
-        vlan: 0
-      ge-0/0/3.0:
-        cost: 1000
-        ip: 10.0.56.5
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx6
-        vlan: 0
-    mgmt: 10.39.0.195
-    rid: 5.5.5.5
-    rid6: fec0:0:0:1111::5
+      ge-0/0/1.0: { ip: 10.0.34.4, remote: srtut-vmx3, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+      ge-0/0/0.0: { ip: 10.0.34.44, remote: srtut-vmx3, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+      ge-0/0/2.0: { ip: 10.0.45.4, remote: srtut-vmx5, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+
+  srtut-vmx5:
+    mgmt: 100.123.1.5
+    rid:  5.5.5.5
+    rid6:  fec0:0:0:1111::5
     sid: 405
     sid6: 605
+    iso: 49.0001.0010.0100.1005.00
+    ldp: True
     switches:
-    - srtut2-vmx-1--srtut2-vmx5-1
-    - srtut2-vmx4-2--srtut2-vmx5-2
-    - srtut2-vmx5-3--srtut2-vmx6-3
-  srtut2-vmx6:
-    iso: 49.0001.0010.0100.1006.00
-    l3vpn:
-    - intf: lo0.1
-      intf_ip: 100.100.100.6
-      name: BLUE
-      rd: 100
-      rt: 100:100
-    ldp: true
+       - srtut-vmx-1--srtut-vmx5-1
+       - srtut-vmx4-2--srtut-vmx5-2
+       - srtut-vmx5-3--srtut-vmx6-3
     links:
-      ge-0/0/3.0:
-        cost: 1000
-        ip: 10.0.56.6
-        iso: true
-        mask: 24
-        mpls: true
-        remote: srtut2-vmx5
-        vlan: 0
-    mgmt: 10.39.0.196
-    rid: 6.6.6.6
-    rid6: fec0:0:0:1111::6
+      ge-0/0/1.0: { ip: 10.0.105.5, remote: srtut-vmx, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+      ge-0/0/2.0: { ip: 10.0.45.5, remote: srtut-vmx4, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+      ge-0/0/3.0: { ip: 10.0.56.5, remote: srtut-vmx6, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+
+  srtut-vmx6:
+    mgmt: 100.123.1.6
+    rid:  6.6.6.6
+    rid6:  fec0:0:0:1111::6
     sid: 406
     sid6: 606
+    iso: 49.0001.0010.0100.1006.00
+    ldp: True
+    l3vpn: [{'intf': 'lo0.1', 'intf_ip': '100.100.100.6', 'name': 'BLUE', 'rd': 100, 'rt': '100:100'}]
     switches:
-    - srtut2-vmx5-3--srtut2-vmx6-3
+       - srtut-vmx5-3--srtut-vmx6-3
+    links:
+      ge-0/0/3.0: { ip: 10.0.56.6, remote: srtut-vmx5, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}

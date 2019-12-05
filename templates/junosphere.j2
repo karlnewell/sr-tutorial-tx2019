@@ -10,7 +10,7 @@ system {
     host-name {{inventory_hostname}};
     no-redirects;
     root-authentication {
-        encrypted-password "$5$mcE0Hfiq$JfBeC3QSAvnd1tjqlOhlYXDgVrwvd6S4G3oVj5wiMO7"; ## SECRET-DATA
+        encrypted-password "$6$q7ZQ3R0N$L53cGK7wGmeyfom5GvYrR2quPXyrEpnFcUmpgxllTvYLKrXoHHCzgf4LbZDeS0zMmhMu/A5eay0WHo1S0/OHa/"; ## SECRET-DATA
     }
     login {
         user salt {
@@ -157,7 +157,7 @@ interfaces {
         description "OOB to MGMT Network";
         unit 0 {
             family inet {
-                address {{node.mgmt}}/21;
+                address {{node.mgmt}}/16;
             }
         }
     }
