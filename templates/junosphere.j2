@@ -283,7 +283,8 @@ protocols {
 #}
 {% if node.iso is defined %}
     isis {
-        {# source-packet-routing {
+{%      if sr_enabled is defined %}
+        source-packet-routing {
             srgb start-label 16000 index-range 8000;
             node-segment {
                 ipv4-index {{ node.sid }};
@@ -291,7 +292,8 @@ protocols {
                 ipv6-index {{ node.sid6 }};
 {%              endif %}
             }
-        } #}
+        }
+{%      endif %}
         level 1 disable;
         level 2 wide-metrics-only;
 {%      for intf, intf_attr in node.links.items()|sort %}
