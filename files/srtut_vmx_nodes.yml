@@ -7,7 +7,7 @@
 
 common:
     bgp_asn: 65000
-    gateway: 10.39.0.1
+    gateway: 100.123.0.1
 
 nodes:
 
@@ -25,6 +25,16 @@ nodes:
     links:
       ge-0/0/0.0: { ip: 10.0.101.10, remote: srtut-vmx1, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
       ge-0/0/1.0: { ip: 10.0.105.10, remote: srtut-vmx5, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+    bgp:
+       ibgp:
+         rr: true
+         peers:
+            - 2.2.2.2
+            - 6.6.6.6
+         af:
+            - inet
+            - inet6
+            - inet-vpn
 
   srtut-vmx1:
     mgmt: 100.123.1.1
@@ -42,6 +52,14 @@ nodes:
       ge-0/0/0.0: { ip: 10.0.101.1, remote: srtut-vmx, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
       ge-0/0/1.0: { ip: 10.0.12.1, remote: srtut-vmx2, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
       ge-0/0/2.0: { ip: 10.0.13.1, remote: srtut-vmx3, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+    bgp:
+       ibgp:
+         peers:
+            - 10.10.10.10
+         af:
+            - inet
+            - inet6
+            - inet-vpn
 
   srtut-vmx2:
     mgmt: 100.123.1.2
@@ -51,11 +69,19 @@ nodes:
     sid6: 602
     iso: 49.0001.0010.0100.1002.00
     ldp: True
-    l3vpn: [{'intf': 'lo0.1', 'intf_ip': '100.100.100.2', 'name': 'BLUE', 'rd': 100, 'rt': '100:100'}]
+    l3vpn: [{'rt': '100:100', 'name': 'BLUE', 'intf_ip': '100.100.100.2', 'rd': 100, 'intf': 'lo0.1'}]
     switches:
        - srtut-vmx1-1--srtut-vmx2-1
     links:
       ge-0/0/1.0: { ip: 10.0.12.2, remote: srtut-vmx1, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+    bgp:
+       ibgp:
+         peers:
+            - 10.10.10.10
+         af:
+            - inet
+            - inet6
+            - inet-vpn
 
   srtut-vmx3:
     mgmt: 100.123.1.3
@@ -73,6 +99,14 @@ nodes:
       ge-0/0/2.0: { ip: 10.0.13.3, remote: srtut-vmx1, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
       ge-0/0/1.0: { ip: 10.0.34.3, remote: srtut-vmx4, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
       ge-0/0/0.0: { ip: 10.0.34.33, remote: srtut-vmx4, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+    bgp:
+       ibgp:
+         peers:
+            - 10.10.10.10
+         af:
+            - inet
+            - inet6
+            - inet-vpn
 
   srtut-vmx4:
     mgmt: 100.123.1.4
@@ -90,6 +124,14 @@ nodes:
       ge-0/0/1.0: { ip: 10.0.34.4, remote: srtut-vmx3, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
       ge-0/0/0.0: { ip: 10.0.34.44, remote: srtut-vmx3, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
       ge-0/0/2.0: { ip: 10.0.45.4, remote: srtut-vmx5, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+    bgp:
+       ibgp:
+         peers:
+            - 10.10.10.10
+         af:
+            - inet
+            - inet6
+            - inet-vpn
 
   srtut-vmx5:
     mgmt: 100.123.1.5
@@ -107,6 +149,14 @@ nodes:
       ge-0/0/1.0: { ip: 10.0.105.5, remote: srtut-vmx, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
       ge-0/0/2.0: { ip: 10.0.45.5, remote: srtut-vmx4, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
       ge-0/0/3.0: { ip: 10.0.56.5, remote: srtut-vmx6, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+    bgp:
+       ibgp:
+         peers:
+            - 10.10.10.10
+         af:
+            - inet
+            - inet6
+            - inet-vpn
 
   srtut-vmx6:
     mgmt: 100.123.1.6
@@ -116,8 +166,16 @@ nodes:
     sid6: 606
     iso: 49.0001.0010.0100.1006.00
     ldp: True
-    l3vpn: [{'intf': 'lo0.1', 'intf_ip': '100.100.100.6', 'name': 'BLUE', 'rd': 100, 'rt': '100:100'}]
+    l3vpn: [{'rt': '100:100', 'name': 'BLUE', 'intf_ip': '100.100.100.6', 'rd': 100, 'intf': 'lo0.1'}]
     switches:
        - srtut-vmx5-3--srtut-vmx6-3
     links:
       ge-0/0/3.0: { ip: 10.0.56.6, remote: srtut-vmx5, mask: 24, cost: 1000, vlan: 0, mpls: True, iso: True}
+    bgp:
+       ibgp:
+         peers:
+            - 10.10.10.10
+         af:
+            - inet
+            - inet6
+            - inet-vpn

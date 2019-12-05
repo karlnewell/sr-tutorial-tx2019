@@ -153,15 +153,39 @@ routing-options {
     }
     static {
         route 0.0.0.0/0 {
-            next-hop 10.39.0.1;
+            next-hop 100.123.0.1;
             no-readvertise;
             preference 255;
         }
     }
 }
 protocols {
+    bgp {
+        group Core {
+            type internal;
+            export __Ansible_Core_export;
+            local-address 5.5.5.5;
+            family inet {               
+                unicast;
+            }
+            family inet6 {
+                unicast;
+            }
+            family inet-vpn {
+                unicast;
+            }
+            neighbor 10.10.10.10;
+        }
+    }
     isis {
-                level 1 disable;
+        source-packet-routing {
+            srgb start-label 1000 index-range 9000;
+            node-segment {
+                ipv4-index 405;
+                ipv6-index 605;
+            }
+        }
+        level 1 disable;
         level 2 wide-metrics-only;
         interface ge-0/0/1.0 {
             point-to-point;
@@ -186,6 +210,7 @@ protocols {
         interface lo0.0;
     }
     mpls {
+    	icmp-tunneling;
         interface ge-0/0/1.0;
         interface ge-0/0/2.0;
         interface ge-0/0/3.0;
@@ -202,6 +227,18 @@ policy-options {
     policy-statement LOAD-BALANCE {
         then {
             load-balance per-packet;
+        }
+    }
+    policy-statement __Ansible_Core_export {
+        term ebgp {
+            from {
+                protocol bgp;
+                external;
+            }
+            then {
+                next-hop self;
+                accept;
+            }
         }
     }
 }
