@@ -1,0 +1,22 @@
+---
+- name: Snapshot lab
+  hosts: "{{ variable_hosts }}"
+  tags: snapshot
+  gather_facts: no
+  vars_files: group_vars/vmware
+  tasks:
+  - name: snapshot
+    vmware_guest_snapshot:
+      hostname: "{{ esxi_hostname }}"
+      username: "{{ esxi_username }}"
+      password: "{{ esxi_password }}"
+      datacenter: "NS Lab"
+      folder: /
+      validate_certs: False
+      name: "{{ item }}"
+      state: "{{ snapshot_state|default('present') }}"
+      snapshot_name: "{{ snapshot_name }}"
+    loop:
+    - "{{ inventory_hostname }}-vcp"
+    - "{{ inventory_hostname }}-vfpc"
+    delegate_to: localhost

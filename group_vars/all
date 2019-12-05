@@ -1,0 +1,4 @@
+---
+ansible_user: salt
+ansible_ssh_private_key_file: /srv/salt/ssh/id_rsa
+remote_user: "{{ ansible_user }}"

@@ -1,0 +1,400 @@
+{% set node = nodes[inventory_hostname] %}
+
+{#
+**************************************************
+###         System configuration            ######
+**************************************************
+    #}
+version {{ansible_net_version}}
+system {
+    host-name {{inventory_hostname}};
+    no-redirects;
+    root-authentication {
+        encrypted-password "$5$mcE0Hfiq$JfBeC3QSAvnd1tjqlOhlYXDgVrwvd6S4G3oVj5wiMO7"; ## SECRET-DATA
+    }
+    login {
+        user salt {
+            uid 2001;
+            class super-user;
+            authentication {
+                encrypted-password "$5$yp7ziGTI$F5F.6AUlR8hDK2JIsw5WRrTLex/yTCWH3iSR1Auk293"; ## SECRET-DATA
+                ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCjxY2hLZ+ju5wdK4GYNhKGgnS8EWLBoEVpo+xQkhDzkTiBx3HGAnmARcVV0B9MqrHZl1omdnirJeygWzVbVY4yPUqGgEcUsTTq9fvK4AjTwtaoB5txAosaOnZq0zewmuZ6EMi6E3RND6A3FGXkf1Il2jg3I8k/dGqdyFI80B7sWy90fk+EqsGMPxVc+l5vAtY2jm84ellxxzBsulxfCSKPH86hZ1GqZ8A1ZBWITu15NjQw0aGssSYGMMTa1T8eFyY4hHWqqdwgOlODg9mZwwP1JdJH79SRoTOjqGGixuAFDGAgH3fNX6u8wTmYya/z7WXH6B2XwiiaZYdcyEbMLPZt"; ## SECRET-DATA
+            }
+        }
+        user jcluser {
+            uid 2000;
+            class super-user;
+            authentication {
+                encrypted-password "$6$7rmbaWhB$QSsd9lpzkDZEV/ebNdv4U37un2hGiVSP1WMChfTjys.N9U7TjA8ezyrEQVsGaJiLgIikVJFVfhV/OAnf4.ssM1"; ## SECRET-DATA
+                ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDCKe9JQ37jkk+LsYfXpQY3Ae0bujvN5aMukCiEqsXWKTZNll3wosDgQbn9vLANBYTPJVVMojByllBqux58mbNZiof5u5ZiH+NBxPGj6abFMspc/TXE/tNTnvBmkyJ20H0OW+gMDI3Pzs4UOV/BKcSifrdDg6gZsXwiBGoueT+v2D29oiqlQiwU80IhsjEw7EnZAzOdc9uYxtF8fCOmViN2TydUL1JUdux8org/0HVaRGRLoG8IKikF5jp/qvBb1+5zT0DKhyY5xp3yHa9gYSLENDJC+NrkERpq25bz96pIzo2205ULUETMRB79eKfvtkJZCiUQlubglD4GcW/8hq43"; ## SECRET-DATA
+            }
+        }
+    }
+    scripts {
+        language python;
+    }
+    services {
+        ssh {
+            root-login allow;
+            }
+        extension-service {
+            request-response {
+                grpc {
+                    clear-text;
+                    max-connections 10;
+                    skip-authentication;
+                }
+            }
+        }
+        netconf {
+            ssh;
+            traceoptions {
+                file nc.txt size 1m world-readable;
+                flag all;
+            }
+        }
+        rest {
+            http {
+                port 3000;
+            }
+            enable-explorer;
+        }
+    }
+    syslog {
+        user * {
+            any emergency;
+        }
+        file messages {
+            any any;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+    }
+    processes {
+        dhcp-service {
+            traceoptions {
+                file dhcp_logfile size 10m;
+                level all;
+                flag packet;
+            }
+        }
+    }
+}
+chassis {
+    fpc 0 {
+        pic 0 {
+            number-of-ports 8;
+        }
+        lite-mode;
+    }
+    network-services enhanced-ip;
+{% if node.lags is defined %}
+    aggregated-devices {
+        ethernet {
+            device-count 10;
+        }
+    }
+{% endif %}
+}
+{#
+**************************************************
+###         Interfaces configuration        ######
+**************************************************
+    #}
+interfaces {
+{% for intf,intf_attr in node.links.items()|sort %}
+    {{ intf.split('.')[0] }} {
+        description "{{intf_attr.remote}}"
+{%      if intf_attr.vlan  is defined and intf_attr.vlan != 0 %}
+        vlan-tagging;
+        encapsulation flexible-ethernet-services;
+        unit {{intf_attr.vlan}} {
+            vlan-id {{intf_attr.vlan}};
+            family inet {
+                address {{intf_attr.ip}}/{{intf_attr.mask|default('24')}}
+            }
+{%          if node.rid6 is defined %}
+            family inet6;
+{%          endif %}
+{#          if intf_attr.mpls is defined #}
+            family mpls;
+{#          endif #}
+        }
+    }
+{%      else %}
+        unit 0 {
+            family inet {
+{%              if intf_attr.ip %}
+                address {{intf_attr.ip}}/{{intf_attr.mask|default('24')}}
+{%              endif %}
+            }
+{%          if node.rid6 is defined %}
+            family inet6;
+{%          endif %}
+{%          if intf_attr.mpls is defined %}
+            family mpls;
+{%          endif %}
+{%          if intf_attr.iso is defined %}
+            family iso;
+{%          endif %}
+        }
+    }
+{%      endif %}   
+{% endfor %}
+{% if node.lags is defined %}
+{% for intf,lag in node.lags.items()|sort %}
+    {{ intf.split('.')[0] }} {
+        description "[{{ lag }}]"
+	gigether-options {
+            802.3ad {{ lag }};
+        }
+    }
+{% endfor %}
+{% endif %}
+    fxp0 {
+        description "OOB to MGMT Network";
+        unit 0 {
+            family inet {
+                address {{node.mgmt}}/21;
+            }
+        }
+    }
+    lo0 {
+        unit 0 {
+            family inet {
+                address {{node.rid}}/32;
+            }
+{%          if node.rid6 is defined %}
+            family inet6 {
+                address {{node.rid6}}/128;
+            }
+{%          endif %}
+{%          if node.iso is defined %}
+            family iso {
+                address {{node.iso}};
+            }
+{%          endif %}            
+        }
+{%      if node.l3vpn is defined %}
+{%      for instance in node.l3vpn %}
+        unit {{ instance.intf.split('.')[1] }} {
+            family inet {
+                address {{instance.intf_ip}}/32;
+            }
+        }
+{%      endfor %}
+{%      endif %}
+    }
+}
+{#
+**************************************************
+###         Global Variables                ######
+**************************************************
+    #}
+routing-options {
+    router-id {{ node.rid }};
+    autonomous-system {{ common.bgp_asn }};
+    forwarding-table {
+        export LOAD-BALANCE;
+    }
+    static {
+        route 0.0.0.0/0 {
+            next-hop {{ common.gateway }};
+            no-readvertise;
+            preference 255;
+        }
+    }
+}
+protocols {
+{#
+**************************************************
+###         BGP  Variables                  ######
+**************************************************
+#}
+{% if node.bgp is defined %}
+    bgp {
+{%      if node.bgp.ibgp is defined %}
+        group Core {
+            type internal;
+{%          if node.bgp.ibgp.rr is not defined  %}
+            export __Ansible_Core_export;
+{%          endif %}
+            local-address {{ node.rid}};
+{%          if node.bgp.ibgp.rr is defined and node.bgp.ibgp.rr == true %}
+            cluster {{node.rid}};
+{%          endif %}
+{%          for af in node.bgp.ibgp.af %}
+{%          if af == 'inet' %}
+            family inet {               
+                unicast;
+            }
+{%          endif %}
+{%          if af == 'inet6' %}
+            family inet6 {
+                unicast;
+            }
+{%          endif %}
+{%          if af == 'inet-vpn' %}
+            family inet-vpn {
+                unicast;
+            }
+{%          endif %}
+{%          if af == 'evpn' %}
+            family evpn {
+                signaling;
+            }
+{%          endif %}
+{%          endfor %}
+{%          for peer in node.bgp.ibgp.peers %}
+            neighbor {{ peer }};
+{%          endfor %}
+        }
+{%      endif %}
+    }
+{% endif %}
+{#
+**************************************************
+###         OSPF  Variables                  ######
+**************************************************
+#}
+{% if node.ospf is defined %}
+    ospf {
+        area 0 {
+{%          for intf, intf_attr in node.links.items()|sort %}
+            interface {{ intf }} {
+                interface-type p2p;
+{%              if intf_attr.cost is defined %}
+                metric {{intf_attr.cost }};
+{%              endif %}
+            }
+{%          endfor %}
+            interface lo0.0 {
+                passive;
+            }
+        }
+    }
+{% endif %}
+{#
+**************************************************
+###         ISIS Variables                  ######
+**************************************************
+#}
+{% if node.iso is defined %}
+    isis {
+        {# source-packet-routing {
+            srgb start-label 16000 index-range 8000;
+            node-segment {
+                ipv4-index {{ node.sid }};
+{%              if node.sid6 is defined %}
+                ipv6-index {{ node.sid6 }};
+{%              endif %}
+            }
+        } #}
+        level 1 disable;
+        level 2 wide-metrics-only;
+{%      for intf, intf_attr in node.links.items()|sort %}
+{%      if intf_attr.iso is defined %}
+        interface {{ intf }} {
+            point-to-point;
+{%          if intf_attr.cost is defined %}
+            level 2 metric {{intf_attr.cost }};
+{%          endif %}
+        }
+{%      endif %}
+{%      endfor %}
+        interface lo0.0 {
+            passive;
+        }
+    }
+{% endif %}
+{#
+**************************************************
+###         LDP  Variables                  ######
+**************************************************
+#}
+{% if node.ldp is defined  %}
+    ldp {
+{%      for intf, intf_attr in node.links.items()|sort %}
+        interface {{intf}};
+{%      endfor %}
+        interface lo0.0;
+    }
+{% endif %}
+{#
+**************************************************
+###         RSVP  Variables                  ######
+**************************************************
+    #}
+{% if node.rsvp is defined %}
+    rsvp {
+{%      for intf, intf_attr in node.links.items()|sort %}
+        interface {{intf}};
+{%      endfor %}
+    }
+{% endif %}
+{#
+**************************************************
+###         MPLS and LLDP  Variables        ######
+**************************************************
+#}
+    mpls {
+{%      for intf, intf_attr in node.links.items()|sort %}
+        interface {{intf}};
+{%      endfor %}
+    }
+    lldp {
+        port-id-subtype interface-name;
+        neighbour-port-info-display port-id;
+{%      for intf, intf_attr in node.links.items()|sort %}
+        interface {{intf.split('.')[0]}};
+{%      endfor %}
+    }
+}
+{#
+**************************************************
+###         Default BGP Export policy        #####
+**************************************************
+#}
+policy-options {
+    policy-statement LOAD-BALANCE {
+        then {
+            load-balance per-packet;
+        }
+    }
+{% if node.bgp is defined  %}
+{% if node.bgp.ibgp.rr is not defined  %}
+    policy-statement __Ansible_Core_export {
+        term ebgp {
+            from {
+                protocol bgp;
+                external;
+            }
+            then {
+                next-hop self;
+                accept;
+            }
+        }
+    }
+{%  endif %}
+{%  endif %}
+}
+{#
+**************************************************
+###         Routing Instances                #####
+**************************************************
+#}
+{% if node.l3vpn is defined %}
+routing-instances {
+{%  for instance in node.l3vpn %}
+    {{instance.name}} {
+        instance-type vrf;
+        interface {{instance.intf}};
+        route-distinguisher {{node.rid}}:{{instance.rd}};
+        vrf-target target:{{instance.rt}};
+        vrf-table-label;
+    }
+{%  endfor %}
+}
+{% endif %}

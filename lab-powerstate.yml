@@ -1,0 +1,21 @@
+---
+- name: Power on srlab
+  hosts: "{{ variable_hosts }}"
+  gather_facts: no
+  vars_files: group_vars/vmware
+  tasks:
+  - name: power on vcp and vfpc
+    vmware_guest:
+      hostname: "{{ esxi_hostname }}"
+      username: "{{ esxi_username }}"
+      password: "{{ esxi_password }}"
+      esxi_hostname: "{{ esxi_hostname }}"
+      validate_certs: False
+      name: "{{ item }}"
+      folder: /
+      datastore: "host 2 - datastore 2"
+      state: "{{ powerstate }}"
+    loop:
+    - "{{ inventory_hostname }}-vcp"
+    - "{{ inventory_hostname }}-vfpc"
+    delegate_to: localhost

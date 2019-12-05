@@ -1,0 +1,32 @@
+---
+- name: Retrieve PyEZ tables
+  hosts: srlab
+  roles:
+  - juniper.junos
+  gather_facts: no
+  vars:
+    ssh_private_key_file: "{{ ansible_ssh_private_key_file }}"
+  tasks:
+    - name: Retrieve LLDP Neighbor Information Using PyEZ-included Table
+      juniper_junos_table:
+        file: "lldp.yml"
+        host: "{{ ansible_host }}"
+      register: response
+      delegate_to: localhost
+    - name: Print response
+      debug:
+        var: response
+
+    - name: Retrieve routes within 10.0.0/8
+      juniper_junos_table:
+        file: "routes.yml"
+        table: "RouteTable"
+        kwargs:
+          destination: "10.0.0.0/8"
+        host: "{{ ansible_host }}"
+      register: response
+      delegate_to: localhost
+    - name: Print response
+      debug:
+        var: response
+

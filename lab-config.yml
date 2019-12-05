@@ -1,0 +1,59 @@
+---
+- name: Create per node data model
+  gather_facts: no
+  hosts: "{{ variable_hosts }}"
+  tags: [ model ]
+  vars_files:
+  - "vars_files/{{model|default('core-model.yml')}}"
+  tasks:
+  - name: Create per-node data model from fabric data model
+    template: src=core-to-nodes.j2 dest="files/{{ variable_hosts }}_nodes.yml"
+    delegate_to: localhost
+    run_once: True
+
+
+- name: Generate Configuration for all routers
+  gather_facts: no
+  hosts: "{{ variable_hosts }}"
+  tags: [ template ]
+  vars_files:
+  - "files/{{ variable_hosts }}_nodes.yml"
+  tasks:
+#    - name: Gather facts (eos)
+#      eos_facts:
+#      when: 
+#        - ansible_network_os == 'eos'
+#        - dryrun is not defined
+#    - name: Gather facts (junos)
+#      junos_facts:
+#      when: 
+#        - ansible_network_os == 'junos'
+#        - dryrun is not defined
+    - name: create the directory for the configuration
+      file: path="{{ config_dir }}"  state=directory
+      delegate_to: localhost
+      run_once: true
+    - name: Generate Configuration
+      template: src="{{ template | default(ansible_network_os) }}.j2" dest="{{ config_dir }}/{{inventory_hostname}}-config.txt"
+      delegate_to: localhost
+
+
+- name: push the configuration to the devices
+  gather_facts: no
+  hosts: "{{ variable_hosts }}"
+  tags: [ deploy ]
+  vars_files:
+  - "files/{{ variable_hosts }}_nodes.yml"
+  tasks:
+    - name: Load config (junos)
+      junos_config:
+        src: "{{ config_dir }}/{{inventory_hostname}}-config.txt"
+        update: override
+        comment: Ansible config update
+      when: ansible_network_os == 'junos'
+
+    - name: Load config (eos)
+      eos_config:
+        src: "{{ config_dir }}/{{inventory_hostname}}-config.txt"
+      when: ansible_network_os == 'eos'
+

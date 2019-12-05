@@ -1,0 +1,53 @@
+---
+
+common:
+  bgp_asn: 65000
+
+nodes:
+  - name: mm-vmx1
+    mgmt: 10.39.0.110
+    rid: 192.168.0.1
+    rid6: fec0:0:0:1111::1
+    sid: 401
+    sid6: 601
+    iso: 49.0001.0010.0100.1001.00
+
+  - name: mm-vmx2
+    mgmt: 10.39.0.111
+    rid: 192.168.0.2
+    rid6: fec0:0:0:1111::2
+    sid: 402
+    sid6: 602
+    iso: 49.0001.0010.0100.1002.00
+
+  - name: mm-vmx3
+    mgmt: 10.39.0.112
+    rid: 192.168.0.3
+    rid6: fec0:0:0:1111::3
+    sid: 403
+    sid6: 603
+    iso: 49.0001.0010.0100.1003.00
+
+links:
+  - {left: mm-vmx1, left_port: ge-0/0/0, left_ip: 10.0.0.0,
+      right: mm-vmx2, right_port: ge-0/0/0, right_ip: 10.0.0.1, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+  - {left: mm-vmx1, left_port: ge-0/0/1, left_ip: 10.0.0.2,
+      right: mm-vmx3, right_port: ge-0/0/1, right_ip: 10.0.0.3, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+  - {left: mm-vmx2, left_port: ge-0/0/1, left_ip: 10.0.0.22,
+      right: mm-vmx3, right_port: ge-0/0/0, right_ip: 10.0.0.23, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+# bgp:
+#   rr: [192.168.0.4, 192.168.0.7]
+#   clients: [192.168.0.1, 192.168.0.2, 192.168.0.8, 192.168.0.9]
+#   af:
+#     - inet
+#     - inet6
+#     - inet-vpn
+
+#isis:
+#  network: p2p

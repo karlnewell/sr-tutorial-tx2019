@@ -1,0 +1,32 @@
+---
+- name: Deploy Infrastructure Services [DHCP server]
+  hosts: dhcpd
+  become: True
+  tasks:
+  - name: Install ISC dhcpd
+    apt:
+      name: isc-dhcp-server
+      update_cache: yes
+  - name: copy dhcpd.conf
+    template:
+      src: templates/dhcpd.conf.j2
+      dest: /etc/dhcp/dhcpd.conf
+      mode: 0644
+  - name: create dhcpd.hosts
+    copy:
+      content: ""
+      dest: /etc/dhcp/dhcpd.hosts
+      force: no
+      mode: 0644
+  - name: restart dhcpd
+    service:
+      name: isc-dhcp-server
+      state: restarted
+  - name: Install nginx
+    apt:
+      name: nginx
+      update_cache: yes
+  - name: start nginx
+    service:
+      name: nginx
+      state: started

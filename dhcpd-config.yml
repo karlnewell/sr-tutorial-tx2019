@@ -1,0 +1,46 @@
+---
+- name: generate dhcpd.hosts entries
+  hosts: "{{ variable_hosts }}"
+  gather_facts: no
+  vars_files: group_vars/vmware
+  tasks:
+  - name: gather facts
+    delegate_to: localhost
+    vmware_guest_info:
+      hostname: "{{ vcenter_hostname }}"
+      username: "{{ vcenter_username }}"
+      password: "{{ vcenter_password }}"
+#      esxi_hostname: "{{ esxi_hostname }}"
+      validate_certs: False
+#      datastore: "host 2 - datastore 2"
+      datacenter: "NS Lab"
+#      cluster: "NS Lab"
+      name: "{{ inventory_hostname }}-vcp"
+    register: facts
+  - name: edit dhcpd.hosts
+    blockinfile:
+      path: /etc/dhcp/dhcpd.hosts
+      block: |
+        host {{ inventory_hostname }} {
+          hardware ethernet	{{ facts.instance.hw_eth0.macaddress }};
+          fixed-address		{{ ansible_host }};
+          option JUNOS.transfer-mode "http";
+          option JUNOS.config-file-name "{{ inventory_hostname }}.conf";
+        }
+      marker: "# {mark} ANSIBLE MANAGED BLOCK {{ inventory_hostname }}"
+    delegate_to: dhcpd
+    become: True
+  - name: restart dhcpd
+    systemd:
+      name: isc-dhcp-server
+      state: restarted
+    delegate_to: dhcpd
+    become: True
+    run_once: True
+  - name: deploy vmx configs
+    template:
+      src: templates/vmx_base.conf.j2
+      dest: "/var/www/html/{{ inventory_hostname }}.conf"
+      mode: 0644
+    delegate_to: dhcpd
+    become: True

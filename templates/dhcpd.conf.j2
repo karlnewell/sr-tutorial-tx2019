@@ -1,0 +1,25 @@
+# option definitions common to all supported networks...
+option domain-name "internet2.edu";
+option domain-name-servers 207.75.164.59, 192.52.179.250;
+
+default-lease-time 600;
+max-lease-time 7200;
+
+subnet 10.39.0.0 netmask 255.255.248.0 {
+  option routers 10.39.0.1;
+  option broadcast-address 10.39.7.255;
+}
+
+option space JUNOS;
+option JUNOS.config-file-name code 1 = text;
+option JUNOS.image-file-name code 0 = text;
+option JUNOS.image-file-type code 2 = text;
+option JUNOS.transfer-mode code 3 = text;
+option JUNOS.alt-image-file-name code 4= text;
+option JUNOS.http-port code 5= text;
+option JUNOS-encapsulation code 43 = encapsulate JUNOS;
+
+option option-150 code 150={ip-address};
+option option-150 {{ ansible_host }};
+
+include "/etc/dhcp/dhcpd.hosts";

@@ -1,0 +1,69 @@
+set version 20190606.224121_builder.r1033375
+set system host-name tx-connB-2
+set system root-authentication encrypted-password "$5$mcE0Hfiq$JfBeC3QSAvnd1tjqlOhlYXDgVrwvd6S4G3oVj5wiMO7"
+set system login user salt uid 2001
+set system login user salt class super-user
+set system login user salt authentication encrypted-password "$5$yp7ziGTI$F5F.6AUlR8hDK2JIsw5WRrTLex/yTCWH3iSR1Auk293"
+set system login user salt authentication ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCjxY2hLZ+ju5wdK4GYNhKGgnS8EWLBoEVpo+xQkhDzkTiBx3HGAnmARcVV0B9MqrHZl1omdnirJeygWzVbVY4yPUqGgEcUsTTq9fvK4AjTwtaoB5txAosaOnZq0zewmuZ6EMi6E3RND6A3FGXkf1Il2jg3I8k/dGqdyFI80B7sWy90fk+EqsGMPxVc+l5vAtY2jm84ellxxzBsulxfCSKPH86hZ1GqZ8A1ZBWITu15NjQw0aGssSYGMMTa1T8eFyY4hHWqqdwgOlODg9mZwwP1JdJH79SRoTOjqGGixuAFDGAgH3fNX6u8wTmYya/z7WXH6B2XwiiaZYdcyEbMLPZt"
+set system services ssh root-login allow
+set system services extension-service request-response grpc clear-text
+set system services extension-service request-response grpc max-connections 10
+set system services extension-service request-response grpc skip-authentication
+set system services netconf ssh
+set system services netconf traceoptions file nc.txt
+set system services netconf traceoptions file size 1m
+set system services netconf traceoptions file world-readable
+set system services netconf traceoptions flag all
+set system no-redirects
+set system syslog user * any emergency
+set system syslog file messages any any
+set system syslog file messages authorization info
+set system syslog file interactive-commands interactive-commands any
+set chassis network-services enhanced-ip
+set interfaces ge-0/0/0 description tx-connB-1
+set interfaces ge-0/0/0 unit 0 family inet address 10.0.67.7/24
+set interfaces ge-0/0/0 unit 0 family iso
+set interfaces ge-0/0/0 unit 0 family inet6
+set interfaces ge-0/0/0 unit 0 family mpls
+set interfaces fxp0 description "OOB to MGMT Network"
+set interfaces fxp0 unit 0 family inet address 10.39.0.157/20
+set interfaces lo0 unit 0 family inet address 7.7.7.7/32
+set interfaces lo0 unit 0 family iso address 49.0001.0010.0100.1007.00
+set interfaces lo0 unit 0 family inet6 address fec0:0:0:1111::7/128
+set interfaces lo0 unit 7 family inet address 77.77.77.77/32
+set policy-options policy-statement LOAD-BALANCE then load-balance per-packet
+set policy-options policy-statement direct term direct from protocol direct
+set policy-options policy-statement direct term direct then accept
+set routing-instances ipvpn instance-type vrf
+set routing-instances ipvpn interface ge-0/0/1.0
+set routing-instances ipvpn interface lo0.7
+set routing-instances ipvpn route-distinguisher 1:1
+set routing-instances ipvpn vrf-target target:1:1
+set routing-instances ipvpn vrf-table-label
+set routing-options static route 0.0.0.0/0 next-hop 10.39.0.1
+set routing-options static route 0.0.0.0/0 no-readvertise
+set routing-options static route 0.0.0.0/0 preference 255
+set routing-options forwarding-table export LOAD-BALANCE
+set routing-options router-id 7.7.7.7
+set routing-options autonomous-system 6
+set protocols isis source-packet-routing srgb start-label 16000
+set protocols isis source-packet-routing srgb index-range 8000
+set protocols isis source-packet-routing node-segment ipv4-index 407
+set protocols isis source-packet-routing node-segment ipv6-index 607
+set protocols isis level 1 disable
+set protocols isis level 2 wide-metrics-only
+set protocols isis interface ge-0/0/0.0 point-to-point
+set protocols isis interface ge-0/0/0.0 level 2 metric 1000
+set protocols isis interface lo0.0 passive
+set protocols mpls interface ge-0/0/0.0
+set protocols bgp group ibgp type internal
+set protocols bgp group ibgp local-address 7.7.7.7
+set protocols bgp group ibgp family inet labeled-unicast resolve-vpn
+set protocols bgp group ibgp neighbor 6.6.6.6
+set protocols bgp group pe type external
+set protocols bgp group pe multihop ttl 10
+set protocols bgp group pe local-address 7.7.7.7
+set protocols bgp group pe family inet-vpn unicast
+set protocols bgp group pe peer-as 4
+set protocols bgp group pe neighbor 4.4.4.4
+set protocols lldp interface ge-0/0/0

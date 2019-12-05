@@ -1,0 +1,126 @@
+---
+
+common:
+  bgp_asn: 65000
+
+nodes:
+  - name: proto-pe1
+    mgmt: 10.39.0.161
+    rid: 1.1.1.1
+    rid6: fec0:0:0:1111::1
+    sid: 401
+    sid6: 601
+    iso: 49.0001.0010.0100.1001.00
+
+  - name: proto-pe2
+    mgmt: 10.39.0.162
+    rid: 2.2.2.2
+    rid6: fec0:0:0:1111::2
+    sid: 402
+    sid6: 602
+    iso: 49.0001.0010.0100.1002.00
+
+  - name: proto-pe3
+    mgmt: 10.39.0.163
+    rid: 3.3.3.3
+    rid6: fec0:0:0:1111::3
+    sid: 403
+    sid6: 603
+    iso: 49.0001.0010.0100.1003.00
+
+  - name: proto-pe4
+    mgmt: 10.39.0.164
+    rid: 4.4.4.4
+    rid6: fec0:0:0:1111::4
+    sid: 404
+    sid6: 604
+    iso: 49.0001.0010.0100.1004.00
+
+  - name: proto-p5
+    mgmt: 10.39.0.165
+    rid: 5.5.5.5
+    rid6: fec0:0:0:1111::5
+    sid: 405
+    sid6: 605
+    iso: 49.0001.0010.0100.1005.00
+
+  - name: proto-ce1
+    mgmt: 10.39.0.166
+    rid: 11.11.11.11
+    rid6: fec0:0:0:1111::11
+    # sid: 401
+    # sid6: 601
+    # iso: 49.0001.0010.0100.1001.00
+
+  - name: proto-ce2
+    mgmt: 10.39.0.167
+    rid: 22.22.22.22
+    rid6: fec0:0:0:1111::22
+    # sid: 401
+    # sid6: 601
+    # iso: 49.0001.0010.0100.1001.00
+
+  - name: proto-ce3
+    mgmt: 10.39.0.168
+    rid: 33.33.33.33
+    rid6: fec0:0:0:1111::22
+    # sid: 401
+    # sid6: 601
+    # iso: 49.0001.0010.0100.1001.00
+
+  - name: proto-ce4
+    mgmt: 10.39.0.169
+    rid: 44.44.44.44
+    rid6: fec0:0:0:1111::22
+    # sid: 401
+    # sid6: 601
+    # iso: 49.0001.0010.0100.1001.00
+
+links:
+  - {left: proto-pe1, left_port: ge-0/0/0, left_ip: ,
+      right: proto-ce1, right_port: ge-0/0/0, right_ip: , 
+      mask: 24, cost: 1000, mpls: False, iso: False }
+  - {left: proto-pe2, left_port: ge-0/0/0, left_ip: ,
+      right: proto-ce1, right_port: ge-0/0/1, right_ip: , 
+      mask: 24, cost: 1000, mpls: False, iso: False }
+  - {left: proto-pe2, left_port: ge-0/0/3, left_ip: 192.168.33.2,
+      right: proto-ce3, right_port: ge-0/0/0, right_ip: 192.168.33.33, 
+      mask: 24, cost: 1000, mpls: False, iso: False }
+  - {left: proto-pe1, left_port: ge-0/0/1, left_ip: 10.0.15.1,
+      right: proto-p5, right_port: ge-0/0/0, right_ip: 10.0.15.5, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+  - {left: proto-pe1, left_port: ge-0/0/2, left_ip: 10.0.12.1,
+      right: proto-pe2, right_port: ge-0/0/2, right_ip: 10.0.12.2, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+  - {left: proto-pe1, left_port: ge-0/0/3, left_ip: 10.0.13.1,
+      right: proto-pe3, right_port: ge-0/0/3, right_ip: 10.0.13.3, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+  - {left: proto-pe2, left_port: ge-0/0/1, left_ip: 10.0.24.2,
+      right: proto-pe4, right_port: ge-0/0/0, right_ip: 10.0.24.4, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+  - {left: proto-p5, left_port: ge-0/0/1, left_ip: 10.0.35.5,
+      right: proto-pe3, right_port: ge-0/0/0, right_ip: 10.0.35.3, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+  - {left: proto-pe3, left_port: ge-0/0/2, left_ip: 10.0.34.3,
+      right: proto-pe4, right_port: ge-0/0/2, right_ip: 10.0.34.4, 
+      mask: 24, cost: 1000, mpls: True, iso: True }  
+  - {left: proto-pe3, left_port: ge-0/0/1, left_ip: ,
+      right: proto-ce2, right_port: ge-0/0/0, right_ip: , 
+      mask: 24, cost: 1000, mpls: False, iso: False }
+  - {left: proto-pe4, left_port: ge-0/0/1, left_ip: ,
+      right: proto-ce2, right_port: ge-0/0/1, right_ip: , 
+      mask: 24, cost: 1000, mpls: False, iso: False }    
+  - {left: proto-pe3, left_port: ge-0/0/4, left_ip: 192.168.44.3,
+      right: proto-ce4, right_port: ge-0/0/0, right_ip: 192.168.44.44, 
+      mask: 24, cost: 1000, mpls: False, iso: False }
+      
+# bgp:
+#   rr: [192.168.0.4, 192.168.0.7]
+#   clients: [192.168.0.1, 192.168.0.2, 192.168.0.8, 192.168.0.9]
+#   af:
+#     - inet
+#     - inet6
+#     - inet-vpn
+
+#isis:
+#  network: p2p

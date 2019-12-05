@@ -1,0 +1,32 @@
+  - name: Update vmx networking
+    vmware_guest:
+      hostname: "{{ esxi_hostname }}"
+      username: "{{ esxi_username }}"
+      password: "{{ esxi_password }}"
+      esxi_hostname: "{{ esxi_hostname }}"
+      validate_certs: False
+      name: "srtut2-vmx6-vfpc"
+      folder: /
+      datastore: datastore2
+      networks:
+        - name: NS-DEV-NAT
+        - name: "srtut2-vmx6-br-int"
+        - name: "DUMMY"
+          start_connected: False
+        - name: "DUMMY"
+          start_connected: False
+        - name: "DUMMY"
+          start_connected: False
+        - name: "srtut2-vmx5-3--srtut2-vmx6-3"
+          device_type: vmxnet3
+        - name: "DUMMY"
+          start_connected: False
+        - name: "DUMMY"
+          start_connected: False
+        - name: "DUMMY"
+          start_connected: False
+      hardware:
+        num_cpus: 3
+        memory_mb: 8192
+      state: present
+    delegate_to: localhost

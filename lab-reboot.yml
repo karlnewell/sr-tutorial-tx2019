@@ -1,0 +1,10 @@
+---
+- name: Reboot nodes
+  gather_facts: no
+  hosts: "{{ variable_hosts }}"
+  tags: [ reboot ]
+  tasks:
+    - name: Reboot routing engines (junos)
+      junos_command:
+        commands: "request system reboot"
+      when: ansible_network_os == 'junos'

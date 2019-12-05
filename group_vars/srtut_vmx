@@ -1,0 +1,8 @@
+---
+model: core-model-srtut.yml
+config_dir: files/srtut-config
+tasks_dir: files/srtut-tasks
+dryrun: True
+ova_ver: 19.2R1.8
+template: junosphere
+

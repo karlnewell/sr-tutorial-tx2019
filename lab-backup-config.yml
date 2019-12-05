@@ -1,0 +1,22 @@
+---
+- name: backup device config
+  gather_facts: no
+  hosts: "{{ variable_hosts }}"
+  tags: [ backup ]
+  vars_files:
+  - "files/{{ variable_hosts }}_nodes.yml"
+  tasks:
+    - name: Backup config (junos)
+      junos_config:
+        backup: yes
+        backup_options:
+          dir_path: "{{ config_dir }}/backup"
+      when: ansible_network_os == 'junos'
+
+    - name: Backup config (eos)
+      eos_config:
+        backup: yes
+        backup_options:
+          dir_path: "{{ config_dir }}/backup"
+      when: ansible_network_os == 'eos'
+

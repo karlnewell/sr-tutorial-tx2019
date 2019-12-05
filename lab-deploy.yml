@@ -1,0 +1,143 @@
+---
+- name: Create node bridge vswitches
+  hosts: "{{ variable_hosts }}"
+  tags: bridge_switches
+  gather_facts: no
+  vars_files: group_vars/vmware
+  tasks:
+  - name: Create the vswitch
+    vmware_vswitch:
+      hostname: "{{ esxi_hostname }}"
+      username: "{{ esxi_username }}"
+      password: "{{ esxi_password }}"
+      esxi_hostname: "{{ esxi_hostname }}"
+      validate_certs: False
+      switch_name: "{{ inventory_hostname }}-br-int"
+      mtu: 9000
+    delegate_to: localhost
+  - name: Create the portgroup
+    vmware_portgroup:
+      hostname: "{{ esxi_hostname }}"
+      username: "{{ esxi_username }}"
+      password: "{{ esxi_password }}"
+      esxi_hostname: "{{ esxi_hostname }}"
+      validate_certs: False
+      switch_name: "{{ inventory_hostname }}-br-int"
+      portgroup_name: "{{ inventory_hostname }}-br-int"
+      network_policy:
+        promiscuous_mode: true
+        forged_transmits: true
+        mac_changes: true
+      vlan_id: 0
+    delegate_to: localhost
+
+- name: Create internode vswitches
+  hosts: "{{ variable_hosts }}"
+  tags: node_switches
+  gather_facts: no
+  vars_files: 
+    - group_vars/vmware
+    - "files/{{ variable_hosts }}_nodes.yml"
+  tasks:
+  - name: Create the vswitch
+    vmware_vswitch:
+      hostname: "{{ esxi_hostname }}"
+      username: "{{ esxi_username }}"
+      password: "{{ esxi_password }}"
+      esxi_hostname: "{{ esxi_hostname }}"
+      validate_certs: False
+      switch_name: "{{ item }}"
+      mtu: 9000
+    loop: "{{ nodes[inventory_hostname]['switches'] }}"
+    delegate_to: localhost
+  - name: Create the portgroup
+    vmware_portgroup:
+      hostname: "{{ esxi_hostname }}"
+      username: "{{ esxi_username }}"
+      password: "{{ esxi_password }}"
+      esxi_hostname: "{{ esxi_hostname }}"
+      validate_certs: False
+      switch_name: "{{ item }}"
+      portgroup_name: "{{ item }}"
+      security:
+        promiscuous_mode: True
+        forged_transmits: True
+        mac_changes: True
+      vlan_id: 4095
+    loop: "{{ nodes[inventory_hostname]['switches'] }}"
+    delegate_to: localhost
+
+- name: Deploy an ova
+  hosts: "{{ variable_hosts }}"
+  tags: deploy_ova
+  gather_facts: no
+  vars_files: group_vars/vmware
+  tasks:
+  - name: Deploy the vcp ova
+    vmware_deploy_ovf:
+      hostname: "{{ esxi_hostname }}"
+      username: "{{ esxi_username }}"
+      password: "{{ esxi_password }}"
+      validate_certs: False
+      allow_duplicates: no
+      name: "{{ inventory_hostname }}-vcp"
+      datastore: "host 2 - datastore 2"
+      ova: "files/ova/vcp_{{ ova_ver }}.ova"
+      disk_provisioning: thin
+      power_on: no
+      networks:
+        br-ext: NS-DEV-NAT
+        br-int: "{{ inventory_hostname }}-br-int"
+    delegate_to: localhost
+  - name: Deploy the vfpc ova
+    vmware_deploy_ovf:
+      hostname: "{{ esxi_hostname }}"
+      username: "{{ esxi_username }}"
+      password: "{{ esxi_password }}"
+      validate_certs: False
+      allow_duplicates: no
+      name: "{{ inventory_hostname }}-vfpc"
+      datastore: "host 2 - datastore 2"
+      ova: "files/ova/vfpc_{{ ova_ver }}.ova"
+      disk_provisioning: thin
+      power_on: no
+      networks:
+        br-ext: NS-DEV-NAT
+        br-int: "{{ inventory_hostname }}-br-int"
+    delegate_to: localhost
+
+- name: Sort node switches
+  hosts: localhost
+  tags: sort_switches
+  gather_facts: no
+  tasks:
+  - name: Sort node switches
+    command: "{{ ansible_python_interpreter }} {{ playbook_dir }}/files/switch_sort.py {{ playbook_dir }}/files/{{ variable_hosts }}_nodes.yml"
+    args:
+      chdir: "{{ playbook_dir }}"
+
+- name: Generate update network task
+  hosts: "{{ variable_hosts }}"
+  tags: generate_tasks
+  gather_facts: no
+  vars_files: 
+    - "files/{{ variable_hosts }}_nodes.yml"
+  tasks:
+  - name: Create tasks dir
+    file: path="{{ tasks_dir }}" state=directory
+    run_once: True
+    delegate_to: localhost
+  - name: Generate update network task
+    template: 
+      src: "task_update_network.j2"
+      dest: "{{ tasks_dir }}/{{ inventory_hostname }}_task.yml"
+    delegate_to: localhost
+
+- name: Update vmx networking
+  hosts: "{{ variable_hosts }}"
+  tags: update_network
+  gather_facts: no
+  vars_files: group_vars/vmware
+  tasks:
+  - name: Include task
+    include_tasks: "{{ tasks_dir }}/{{ inventory_hostname }}_task.yml"

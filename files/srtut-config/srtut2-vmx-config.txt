@@ -1,0 +1,188 @@
+
+version VERSION
+system {
+    host-name srtut2-vmx;
+    no-redirects;
+    root-authentication {
+        encrypted-password "$5$mcE0Hfiq$JfBeC3QSAvnd1tjqlOhlYXDgVrwvd6S4G3oVj5wiMO7"; ## SECRET-DATA
+    }
+    login {
+        user salt {
+            uid 2001;
+            class super-user;
+            authentication {
+                encrypted-password "$5$yp7ziGTI$F5F.6AUlR8hDK2JIsw5WRrTLex/yTCWH3iSR1Auk293"; ## SECRET-DATA
+                ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCjxY2hLZ+ju5wdK4GYNhKGgnS8EWLBoEVpo+xQkhDzkTiBx3HGAnmARcVV0B9MqrHZl1omdnirJeygWzVbVY4yPUqGgEcUsTTq9fvK4AjTwtaoB5txAosaOnZq0zewmuZ6EMi6E3RND6A3FGXkf1Il2jg3I8k/dGqdyFI80B7sWy90fk+EqsGMPxVc+l5vAtY2jm84ellxxzBsulxfCSKPH86hZ1GqZ8A1ZBWITu15NjQw0aGssSYGMMTa1T8eFyY4hHWqqdwgOlODg9mZwwP1JdJH79SRoTOjqGGixuAFDGAgH3fNX6u8wTmYya/z7WXH6B2XwiiaZYdcyEbMLPZt"; ## SECRET-DATA
+            }
+        }
+        user jcluser {
+            uid 2000;
+            class super-user;
+            authentication {
+                encrypted-password "$6$7rmbaWhB$QSsd9lpzkDZEV/ebNdv4U37un2hGiVSP1WMChfTjys.N9U7TjA8ezyrEQVsGaJiLgIikVJFVfhV/OAnf4.ssM1"; ## SECRET-DATA
+                ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDCKe9JQ37jkk+LsYfXpQY3Ae0bujvN5aMukCiEqsXWKTZNll3wosDgQbn9vLANBYTPJVVMojByllBqux58mbNZiof5u5ZiH+NBxPGj6abFMspc/TXE/tNTnvBmkyJ20H0OW+gMDI3Pzs4UOV/BKcSifrdDg6gZsXwiBGoueT+v2D29oiqlQiwU80IhsjEw7EnZAzOdc9uYxtF8fCOmViN2TydUL1JUdux8org/0HVaRGRLoG8IKikF5jp/qvBb1+5zT0DKhyY5xp3yHa9gYSLENDJC+NrkERpq25bz96pIzo2205ULUETMRB79eKfvtkJZCiUQlubglD4GcW/8hq43"; ## SECRET-DATA
+            }
+        }
+    }
+    scripts {
+        language python;
+    }
+    services {
+        ssh {
+            root-login allow;
+            }
+        extension-service {
+            request-response {
+                grpc {
+                    clear-text;
+                    max-connections 10;
+                    skip-authentication;
+                }
+            }
+        }
+        netconf {
+            ssh;
+            traceoptions {
+                file nc.txt size 1m world-readable;
+                flag all;
+            }
+        }
+        rest {
+            http {
+                port 3000;
+            }
+            enable-explorer;
+        }
+    }
+    syslog {
+        user * {
+            any emergency;
+        }
+        file messages {
+            any any;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+    }
+    processes {
+        dhcp-service {
+            traceoptions {
+                file dhcp_logfile size 10m;
+                level all;
+                flag packet;
+            }
+        }
+    }
+}
+chassis {
+    fpc 0 {
+        pic 0 {
+            number-of-ports 8;
+        }
+        lite-mode;
+    }
+    network-services enhanced-ip;
+}
+interfaces {
+    ge-0/0/0 {
+        description "srtut2-vmx1"
+        unit 0 {
+            family inet {
+                address 10.0.101.10/24
+            }
+            family inet6;
+            family mpls;
+            family iso;
+        }
+    }
+   
+    ge-0/0/1 {
+        description "srtut2-vmx5"
+        unit 0 {
+            family inet {
+                address 10.0.105.10/24
+            }
+            family inet6;
+            family mpls;
+            family iso;
+        }
+    }
+   
+    fxp0 {
+        description "OOB to MGMT Network";
+        unit 0 {
+            family inet {
+                address 10.39.0.190/21;
+            }
+        }
+    }
+    lo0 {
+        unit 0 {
+            family inet {
+                address 10.10.10.10/32;
+            }
+            family inet6 {
+                address fec0:0:0:1111::10/128;
+            }
+            family iso {
+                address 49.0001.0010.0100.1010.00;
+            }
+            
+        }
+    }
+}
+routing-options {
+    router-id 10.10.10.10;
+    autonomous-system 65000;
+    forwarding-table {
+        export LOAD-BALANCE;
+    }
+    static {
+        route 0.0.0.0/0 {
+            next-hop 10.39.0.1;
+            no-readvertise;
+            preference 255;
+        }
+    }
+}
+protocols {
+    isis {
+                level 1 disable;
+        level 2 wide-metrics-only;
+        interface ge-0/0/0.0 {
+            point-to-point;
+            level 2 metric 1000;
+        }
+        interface ge-0/0/1.0 {
+            point-to-point;
+            level 2 metric 1000;
+        }
+        interface lo0.0 {
+            passive;
+        }
+    }
+    ldp {
+        interface ge-0/0/0.0;
+        interface ge-0/0/1.0;
+        interface lo0.0;
+    }
+    mpls {
+        interface ge-0/0/0.0;
+        interface ge-0/0/1.0;
+    }
+    lldp {
+        port-id-subtype interface-name;
+        neighbour-port-info-display port-id;
+        interface ge-0/0/0;
+        interface ge-0/0/1;
+    }
+}
+policy-options {
+    policy-statement LOAD-BALANCE {
+        then {
+            load-balance per-packet;
+        }
+    }
+}

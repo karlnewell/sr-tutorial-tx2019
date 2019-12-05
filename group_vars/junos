@@ -1,0 +1,7 @@
+---
+#ansible_connection: network_cli
+ansible_connection: netconf
+#ansible_connection: local
+ansible_network_os: junos
+ansible_net_version: VERSION
+ansible_python_interpreter: $PWD/venv/bin/python

@@ -1,0 +1,158 @@
+---
+
+common:
+  bgp_asn: 65000
+
+nodes:
+  - name: ksr-vmx1
+    mgmt: 10.39.0.201
+    rid: 192.168.0.1
+    rid6: fec0:0:0:1111::1
+    sid: 401
+    sid6: 601
+    iso: 49.0001.0010.0100.1001.00
+
+  - name: ksr-vmx2
+    mgmt: 10.39.0.202
+    rid: 192.168.0.2
+    rid6: fec0:0:0:1111::2
+    sid: 402
+    sid6: 602
+    iso: 49.0001.0010.0100.1002.00
+
+  - name: ksr-vmx3
+    mgmt: 10.39.0.203
+    rid: 192.168.0.3
+    rid6: fec0:0:0:1111::3
+    sid: 403
+    sid6: 603
+    iso: 49.0001.0010.0100.1003.00
+
+  - name: ksr-vmx4
+    mgmt: 10.39.0.204
+    rid: 192.168.0.4
+    rid6: fec0:0:0:1111::4
+    sid: 404
+    sid6: 604
+    iso: 49.0001.0010.0100.1004.00
+
+  - name: ksr-vmx5
+    mgmt: 10.39.0.205
+    rid: 192.168.0.5
+    rid6: fec0:0:0:1111::5
+    sid: 405
+    sid6: 605
+    iso: 49.0001.0010.0100.1005.00
+
+  - name: ksr-vmx6
+    mgmt: 10.39.0.206
+    rid: 192.168.0.6
+    rid6: fec0:0:0:1111::6
+    sid: 406
+    sid6: 606
+    iso: 49.0001.0010.0100.1006.00
+
+  - name: ksr-vmx7
+    mgmt: 10.39.0.207
+    rid: 192.168.0.7
+    rid6: fec0:0:0:1111::7
+    sid: 407
+    sid6: 607
+    iso: 49.0001.0010.0100.1007.00
+
+  - name: ksr-vmx8
+    mgmt: 10.39.0.208
+    rid: 192.168.0.8
+    rid6: fec0:0:0:1111::8
+    sid: 408
+    sid6: 608
+    iso: 49.0001.0010.0100.1008.00
+
+  - name: ksr-vmx9
+    mgmt: 10.39.0.209
+    rid: 192.168.0.9
+    rid6: fec0:0:0:1111::9
+    sid: 409
+    sid6: 609
+    iso: 49.0001.0010.0100.1009.00
+
+lags:
+  - node: ksr-vmx5
+    intf: ae0
+    ports: [ge-0/0/2, ge-0/0/3]
+  - node: ksr-vmx7
+    intf: ae0
+    ports: [ge-0/0/2, ge-0/0/3]
+
+# using the following for the lag ports. can't extract correct information
+# from the links ae interfaces for lags
+switches:
+  - {left: ksr-vmx5, left_port: ge-0/0/2,
+     right: ksr-vmx7, right_port: ge-0/0/2 } 
+  - {left: ksr-vmx5, left_port: ge-0/0/3,
+     right: ksr-vmx7, right_port: ge-0/0/3 } 
+
+links:
+  - {left: ksr-vmx1, left_port: ge-0/0/0, left_ip: 10.0.0.0,
+      right: ksr-vmx2, right_port: ge-0/0/0, right_ip: 10.0.0.1, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+  - {left: ksr-vmx1, left_port: ge-0/0/1, left_ip: 10.0.0.2,
+      right: ksr-vmx4, right_port: ge-0/0/1, right_ip: 10.0.0.3, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+  - {left: ksr-vmx1, left_port: ge-0/0/2, left_ip: 10.0.0.22,
+      right: ksr-vmx3, right_port: ge-0/0/0, right_ip: 10.0.0.23, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+  - {left: ksr-vmx2, left_port: ge-0/0/1, left_ip: 10.0.0.4,
+      right: ksr-vmx5, right_port: ge-0/0/1, right_ip: 10.0.0.5, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+  - {left: ksr-vmx3, left_port: ge-0/0/1, left_ip: 10.0.0.24,
+      right: ksr-vmx6, right_port: ge-0/0/4, right_ip: 10.0.0.25, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+  - {left: ksr-vmx4, left_port: ge-0/0/0, left_ip: 10.0.0.6,
+      right: ksr-vmx5, right_port: ge-0/0/0, right_ip: 10.0.0.7, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+  - {left: ksr-vmx4, left_port: ge-0/0/2, left_ip: 10.0.0.8,
+      right: ksr-vmx6, right_port: ge-0/0/2, right_ip: 10.0.0.9, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+  - {left: ksr-vmx4, left_port: ge-0/0/3, left_ip: 10.0.0.10,
+      right: ksr-vmx6, right_port: ge-0/0/3, right_ip: 10.0.0.11, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+  - {left: ksr-vmx5, left_port: ae0, left_ip: 10.0.0.12,
+      right: ksr-vmx7, right_port: ae0, right_ip: 10.0.0.13, 
+      mask: 31, cost: 500, mpls: True, iso: True }
+
+  - {left: ksr-vmx6, left_port: ge-0/0/0, left_ip: 10.0.0.14,
+      right: ksr-vmx7, right_port: ge-0/0/0, right_ip: 10.0.0.15, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+  - {left: ksr-vmx6, left_port: ge-0/0/1, left_ip: 10.0.0.16,
+      right: ksr-vmx8, right_port: ge-0/0/1, right_ip: 10.0.0.17, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+  - {left: ksr-vmx7, left_port: ge-0/0/1, left_ip: 10.0.0.18,
+      right: ksr-vmx9, right_port: ge-0/0/1, right_ip: 10.0.0.19, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+  - {left: ksr-vmx8, left_port: ge-0/0/0, left_ip: 10.0.0.20,
+      right: ksr-vmx9, right_port: ge-0/0/0, right_ip: 10.0.0.21, 
+      mask: 31, cost: 1000, mpls: True, iso: True }
+
+
+#bgp:
+#  rr: [192.168.0.4, 192.168.0.7]
+#  clients: [192.168.0.1, 192.168.0.2, 192.168.0.8, 192.168.0.9]
+#  af:
+#    - inet
+#    - inet6
+#    - inet-vpn
+
+#isis:
+#  network: p2p

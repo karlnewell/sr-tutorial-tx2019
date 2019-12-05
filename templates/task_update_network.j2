@@ -1,0 +1,34 @@
+  - name: Update vmx networking
+    vmware_guest:
+{%-    raw %}
+      hostname: "{{ esxi_hostname }}"
+      username: "{{ esxi_username }}"
+      password: "{{ esxi_password }}"
+      esxi_hostname: "{{ esxi_hostname }}"
+{%    endraw %}
+      validate_certs: False
+      name: "{{ inventory_hostname }}-vfpc"
+      folder: /
+      datastore: datastore2
+      networks:
+        - name: NS-DEV-NAT
+        - name: "{{ inventory_hostname }}-br-int"
+{%      for i in range(0,7) %}
+{%      set dummy = [true] %}
+{%      for switch in nodes[inventory_hostname]['switches'] %}
+{%      if inventory_hostname|string + '-' + i|string in switch %}
+{%      set _ = dummy.append(not dummy.pop()) %}
+        - name: "{{ switch }}"
+          device_type: vmxnet3
+{%      endif %}
+{%      endfor %}
+{%      if dummy[0] %}
+        - name: "DUMMY"
+          start_connected: False
+{%      endif %}
+{%      endfor %}
+      hardware:
+        num_cpus: 3
+        memory_mb: 8192
+      state: present
+    delegate_to: localhost

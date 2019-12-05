@@ -1,0 +1,23 @@
+---
+
+dhcpd_mode: server
+dhcpd_authoritative: True
+dhcpd_interfaces: [ ens192 ]
+ansible_domain: internet2.edu
+
+# where to ask for DNS Server / dhcpd_dns_servers
+#ansible_default_ipv4.address: 10.39.0.2
+
+dhcpd_subnets: [ '{{ dhcpd_subnet_local }}' ]
+
+dhcpd_subnets_local:
+- subnet: '10.39.0.0'
+  netmask: '255.255.248.0'
+  routers: [ '10.39.0.1' ]
+  options: |
+    default-lease-time 300;
+    max-lease-time 7200;
+
+# External file with list of hosts
+dhcpd_hosts: '/etc/dhcp/dhcp-hosts.conf'
+

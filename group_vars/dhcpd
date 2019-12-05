@@ -1,0 +1,2 @@
+ansible_user: knewell
+ansible_python_interpreter: auto

@@ -1,0 +1,40 @@
+system {
+    host-name {{ inventory_hostname }};
+    root-authentication {
+        encrypted-password "$5$dtzjbbOB$kRjqCbWTMGPGR182yFSH/yD1dUEt7uKn1DHEaQUWgt6"; ## SECRET-DATA
+    }
+    login {
+        user salt {
+            uid 2001;
+            class super-user;
+            authentication {
+                encrypted-password "$6$tmYcXGxa$ih9KCU7jQzVLguKdhmJ/fOMs4riKRa09lkSDa13POflyUwk3YCDsq2DvoLN8SPMYC3Ce1n9/GSE8JP9kH8HzE0"; ## SECRET-DATA
+                ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCjxY2hLZ+ju5wdK4GYNhKGgnS8EWLBoEVpo+xQkhDzkTiBx3HGAnmARcVV0B9MqrHZl1omdnirJeygWzVbVY4yPUqGgEcUsTTq9fvK4AjTwtaoB5txAosaOnZq0zewmuZ6EMi6E3RND6A3FGXkf1Il2jg3I8k/dGqdyFI80B7sWy90fk+EqsGMPxVc+l5vAtY2jm84ellxxzBsulxfCSKPH86hZ1GqZ8A1ZBWITu15NjQw0aGssSYGMMTa1T8eFyY4hHWqqdwgOlODg9mZwwP1JdJH79SRoTOjqGGixuAFDGAgH3fNX6u8wTmYya/z7WXH6B2XwiiaZYdcyEbMLPZt"; ## SECRET-DATA
+            }
+        }
+    }
+    services {
+        ssh {
+            protocol-version v2;
+        }
+        netconf {
+            ssh;
+        }
+    }
+}
+interfaces {
+    fxp0 {
+        unit 0 {
+            family inet {
+                address {{ ansible_host }}/21;
+            }
+        }
+    }
+}
+routing-options {
+    static {
+        route 0.0.0.0/0 {
+            next-hop 10.39.0.1;
+        }
+    }
+}
