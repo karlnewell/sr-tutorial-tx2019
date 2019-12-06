@@ -305,16 +305,16 @@ protocols {
 {%      if intf_attr.iso is defined %}
         interface {{ intf }} {
             point-to-point;
-{%          if intf_attr.cost is defined %}
             level 2 {
-	        metric {{intf_attr.cost }};
+{%              if intf_attr.cost is defined %}
+                metric {{intf_attr.cost }};
+{%              endif %}
 {%              if lfa_enabled is defined %}
 	        post-convergence-lfa {
                     node-protection;
                 }
-{%              endif %}
-	    }
 {%          endif %}
+	    }
         }
 {%      endif %}
 {%      endfor %}
