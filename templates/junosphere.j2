@@ -283,6 +283,11 @@ protocols {
 #}
 {% if node.iso is defined %}
     isis {
+{%      if lfa_enabled is defined %}
+	backup-spf-options {
+            use-post-convergence-lfa;
+        }
+{%      endif %}
 {%      if sr_enabled is defined %}
         source-packet-routing {
             srgb start-label 1000 index-range 9000;
@@ -301,7 +306,14 @@ protocols {
         interface {{ intf }} {
             point-to-point;
 {%          if intf_attr.cost is defined %}
-            level 2 metric {{intf_attr.cost }};
+            level 2 {
+	        metric {{intf_attr.cost }};
+{%              if lfa_enabled is defined %}
+	        post-convergence-lfa {
+                    node-protection;
+                }
+{%              endif %}
+	    }
 {%          endif %}
         }
 {%      endif %}
