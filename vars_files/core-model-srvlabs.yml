@@ -1,0 +1,131 @@
+---
+
+common:
+  bgp_asn: 65000
+  gateway: 100.123.0.1
+
+nodes:
+  - name: srvlabs-vmx1
+    mgmt: 100.123.1.0
+    rid: 10.100.100.1
+    rid6: fec0:0:0:1111::1
+    sid: 401
+    sid6: 601
+    iso: 49.0001.0010.0100.1001.00
+    ldp: True
+
+  - name: srvlabs-vmx2
+    mgmt: 100.123.1.1
+    rid: 10.100.100.2
+    rid6: fec0:0:0:1111::2
+    sid: 402
+    sid6: 602
+    iso: 49.0001.0010.0100.1002.00
+    ldp: True
+
+  - name: srvlabs-vmx3
+    mgmt: 100.123.1.2
+    rid: 10.100.100.3
+    rid6: fec0:0:0:1111::3
+    sid: 403
+    sid6: 603
+    iso: 49.0001.0010.0100.1003.00
+    ldp: True
+
+  - name: srvlabs-vmx4
+    mgmt: 100.123.1.3
+    rid: 10.100.100.4
+    rid6: fec0:0:0:1111::4
+    sid: 404
+    sid6: 604
+    iso: 49.0001.0010.0100.1004.00
+    ldp: True
+
+  - name: srvlabs-vmx5
+    mgmt: 100.123.1.4
+    rid: 10.100.100.5
+    rid6: fec0:0:0:1111::5
+    sid: 405
+    sid6: 605
+    iso: 49.0001.0010.0100.1005.00
+    ldp: True
+    l3vpn:
+      - name: BLUE
+        rt: 100:100
+        rd: 100
+        intf: lo0.1
+        intf_ip: 100.100.100.5
+
+  - name: srvlabs-vmx6
+    mgmt: 100.123.1.5
+    rid: 10.100.100.6
+    rid6: fec0:0:0:1111::6
+    sid: 406
+    sid6: 606
+    iso: 49.0001.0010.0100.1006.00
+    ldp: True
+    l3vpn:
+      - name: BLUE
+        rt: 100:100
+        rd: 100
+        intf: lo0.1
+        intf_ip: 100.100.100.6
+
+lags:
+
+# using the following for the lag ports. can't extract correct information
+# from the links ae interfaces for lags
+switches:
+
+links:
+  - {left: srvlabs-vmx1, left_port: ge-0/0/0, left_ip: 10.100.12.1,
+      right: srvlabs-vmx2, right_port: ge-0/0/0, right_ip: 10.100.12.2, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+
+  - {left: srvlabs-vmx1, left_port: ge-0/0/2, left_ip: 10.100.13.1,
+      right: srvlabs-vmx3, right_port: ge-0/0/2, right_ip: 10.100.13.2, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+
+  - {left: srvlabs-vmx1, left_port: ge-0/0/1, left_ip: 10.100.14.1,
+      right: srvlabs-vmx4, right_port: ge-0/0/1, right_ip: 10.100.14.2, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+
+  - {left: srvlabs-vmx1, left_port: ge-0/0/3, left_ip: 10.100.15.1,
+      right: srvlabs-vmx5, right_port: ge-0/0/3, right_ip: 10.100.15.2, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+
+  - {left: srvlabs-vmx2, left_port: ge-0/0/1, left_ip: 10.100.23.1,
+      right: srvlabs-vmx3, right_port: ge-0/0/1, right_ip: 10.100.23.2, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+
+  - {left: srvlabs-vmx2, left_port: ge-0/0/2, left_ip: 10.100.24.1,
+      right: srvlabs-vmx4, right_port: ge-0/0/2, right_ip: 10.100.24.2, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+
+  - {left: srvlabs-vmx2, left_port: ge-0/0/3, left_ip: 10.100.26.1,
+      right: srvlabs-vmx6, right_port: ge-0/0/3, right_ip: 10.100.26.2, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+
+  - {left: srvlabs-vmx3, left_port: ge-0/0/0, left_ip: 10.100.34.1,
+      right: srvlabs-vmx4, right_port: ge-0/0/0, right_ip: 10.100.34.2, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+
+  - {left: srvlabs-vmx3, left_port: ge-0/0/4, left_ip: 10.100.35.1,
+      right: srvlabs-vmx5, right_port: ge-0/0/4, right_ip: 10.100.35.2, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+
+  - {left: srvlabs-vmx4, left_port: ge-0/0/4, left_ip: 10.100.46.1,
+      right: srvlabs-vmx6, right_port: ge-0/0/4, right_ip: 10.100.46.2, 
+      mask: 24, cost: 1000, mpls: True, iso: True }
+
+
+bgp:
+  rr: [10.100.100.1]
+  clients: [10.100.100.5, 10.100.100.6]
+  af:
+    - inet
+    - inet6
+    - inet-vpn
+
+#isis:
+#  network: p2p
